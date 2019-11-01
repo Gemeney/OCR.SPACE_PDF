@@ -13,7 +13,6 @@ namespace OCR_PDF
 {
     class API
     {
-        //Dictionary<string, string> args = new Dictionary<string, string>();
         string APIKey = ""; //Personnal API Key
         string APIURLFree = "https://api.ocr.space/parse/image"; //Link to the API Service.
 
@@ -25,7 +24,7 @@ namespace OCR_PDF
         }
         
         
-        public void OCRFile(string filePath)
+        public void OCRFile(string filePath, string outputFolder)
         {
             RestRequest request = new RestRequest(Method.POST);
             string fileName = Path.GetFileName(filePath);
@@ -46,12 +45,12 @@ namespace OCR_PDF
             //File download
             using (WebClient myWebClient = new WebClient())
             {
-                myWebClient.DownloadFile(fichierReconnu.SearchablePDFURL, @"I:\sortie\" + fileName);
+                myWebClient.DownloadFile(fichierReconnu.SearchablePDFURL, outputFolder + fileName);
             }
 
             Console.WriteLine(fichierReconnu.SearchablePDFURL);
             Console.WriteLine(filePath);
-            Console.WriteLine("Temps Conversion :" + fichierReconnu.ProcessingTimeInMilliseconds);
+            Console.WriteLine("Indexation Time :" + fichierReconnu.ProcessingTimeInMilliseconds);
             Console.WriteLine("ok");
 
         }

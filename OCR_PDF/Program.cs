@@ -15,24 +15,51 @@ namespace OCR_PDF
     {
 
         //This simple software ames to use the OCR.SPACE API, for analysing and makind an indexed PDF.
-        static void Main(string[] args)
+        static void Main()
         {
             //I/O files paths. Though the free version accepts file < 1024 kb and max 3 pages.
-            string[] arrayFilesToOCR = Directory.GetFiles(@"I:\input");
-            string[] arrayDoneFiles = Directory.GetFiles(@"I:\output");
+            string inputFolder = @"I:\input";
+            string outputFodler = @"I:\output";
+            string[] arrayFilesToOCR = Directory.GetFiles(inputFolder);
+            string[] arrayDoneFiles = Directory.GetFiles(outputFodler);
 
-            foreach (string file in arrayFilesToOCR)
-            {
-                //Check what files has been done
-                if (!(Array.Exists(arrayDoneFiles, element => Path.GetFileName(element) == Path.GetFileName(file))))
-                {   
-                    API api = new API();
-                    Console.WriteLine(file);
-                    api.OCRFile(file);
-                    //The server of the API has a problem. It 
-                    Thread.Sleep(30000);
-                }                
+            int timeBeforeTry = 10; //The API's server has a problem. It's necessary to relaunch the OCR.
+            API api = new API();
+
+            try { 
+                foreach (string file in arrayFilesToOCR)
+                {
+                    //Check what files has been done
+                    if (!(Array.Exists(arrayDoneFiles, element => Path.GetFileName(element) == Path.GetFileName(file))))
+                    {   
+                        
+                        Console.WriteLine(file);
+                        api.OCRFile(file, outputFodler);
+                    }                
+                }
             }
+            catch(Exception ex)
+            {
+                Console.WriteLine(ex.Message);
+                for (int time = timeBeforeTry; time != 0; time--)
+                {
+                    Console.Write("\nCount down before new atempt : " + time.ToString() + "s");
+                    Thread.Sleep(1000);
+                    ClearCurrentConsoleLine();
+                }
+
+                //Clear the line and write the new countdown  time.
+                void ClearCurrentConsoleLine()
+                {
+                    int currentLineCursor = Console.CursorTop;
+                    Console.SetCursorPosition(0, Console.CursorTop);
+                    Console.Write(new string(' ', Console.WindowWidth));
+                    Console.SetCursorPosition(0, currentLineCursor - 1);
+                }
+
+                Main();
+            }
+
 
             Console.WriteLine("************************************************");
             Console.WriteLine("********************* END **********************");
